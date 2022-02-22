@@ -34,7 +34,11 @@ namespace CGL
   std::vector<Vector3D> BezierPatch::evaluateStep(std::vector<Vector3D> const &points, double t) const
   {
     // TODO Part 2.
-    return std::vector<Vector3D>();
+      std::vector<Vector3D> decast = std::vector<Vector3D>();
+        for (int i = 0; i < points.size() - 1; i++) {
+            decast.push_back((1-t)*points[i] + (t)*points[i+1]);
+        }
+        return decast;
   }
 
   /**
@@ -47,7 +51,24 @@ namespace CGL
   Vector3D BezierPatch::evaluate1D(std::vector<Vector3D> const &points, double t) const
   {
     // TODO Part 2.
-    return Vector3D();
+      if (points.size() <= 1) {
+          return points[0];
+      }
+      
+      std::vector<Vector3D> points2;
+      int i = 0;
+      while (i == 0 || points2.size() > 1) {
+          if (i == 0) {
+              points2 = evaluateStep(points, t);
+          }
+          else {
+              points2 = evaluateStep(points2, t);
+          }
+          i++;
+      }
+      
+      return points2[0];
+      
   }
 
   /**
@@ -60,7 +81,11 @@ namespace CGL
   Vector3D BezierPatch::evaluate(double u, double v) const 
   {  
     // TODO Part 2.
-    return Vector3D();
+    std::vector<Vector3D> other_axis = std::vector<Vector3D>();
+      for (int i = 0; i < controlPoints.size(); i++) {
+          other_axis.push_back(evaluate1D(controlPoints[i], u));
+      }
+    return evaluate1D(other_axis, v);
   }
 
   Vector3D Vertex::normal( void ) const

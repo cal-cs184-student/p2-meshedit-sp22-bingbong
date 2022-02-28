@@ -116,6 +116,14 @@ namespace CGL
   {
     // TODO Part 4.
     // This method should flip the given edge and return an iterator to the flipped edge.
+
+      if (e0->getHalfedge()->isBoundary() || e0->getHalfedge()->twin()->isBoundary()) {
+          return e0;
+    }
+    //save all the old stuff
+      //old edges
+      //old vertices
+    //
     return EdgeIter();
   }
 

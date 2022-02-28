@@ -30,75 +30,109 @@
 
   <h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2020</h1>
   <h1 align="middle">Project 2: Mesh Editor</h1>
-  <h2 align="middle">YOUR NAME, CS184-??</h2>
+  <h2 align="middle">Varun Saran, Ze-Ning Ong, CS184-bingbong</h2>
 
   <br><br>
 
-  <div>
+      <div>
 
-    <h2 align="middle">Overview</h2>
-    <p>Give a high-level overview of what you implemented in this project. Think about what you've built as a whole.
-      Share your thoughts on what interesting things you've learned from completing the project.</p>
+          <h2 align="middle">Overview</h2>
+          <p>
+              Give a high-level overview of what you implemented in this project. Think about what you've built as a whole.
+              Share your thoughts on what interesting things you've learned from completing the project.
+          </p>
 
-    <h2 align="middle">Section I: Bezier Curves and Surfaces</h2>
+          <h2 align="middle">Section I: Bezier Curves and Surfaces</h2>
 
-    <h3 align="middle">Part 1: Bezier curves with 1D de Casteljau subdivision</h3>
+          <h3 align="middle">Part 1: Bezier curves with 1D de Casteljau subdivision</h3>
+          <p> De Casteljau's algorithm is a recursive algorithm that uses linear interpolation to eventually draw a smooth curve based on a set of given control points. What we did in this task was simply to evaluate a single step in the algorithm. For each point in the given set of control points, we interpolated between that point and the next point. We put all of these points in a vector to be returned for the next step in the algorithm.  </p>
 
-    <p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a
-      column in that row. You might find this useful for framing and showing your result images in an organized fashion.
-    </p>
+          <p>Here is an example of De Casteljau's algorithm with 6 control points.</p>
 
-    <div align="middle">
-      <table style="width=100%">
-        <tr>
-          <td>
-            <img src="images/image1.png" align="middle" width="400px" />
-            <figcaption align="middle">Caption goes here.</figcaption>
-          </td>
-          <td>
-            <img src="images/image2.png" align="middle" width="400px" />
-            <figcaption align="middle">Caption goes here.</figcaption>
-          </td>
-        </tr>
-        <br>
-        <tr>
-          <td>
-            <img src="images/image3.png" align="middle" width="400px" />
-            <figcaption align="middle">Caption goes here.</figcaption>
-          </td>
-          <td>
-            <img src="images/image4.png" align="middle" width="400px" />
-            <figcaption align="middle">Caption goes here.</figcaption>
-          </td>
-        </tr>
-      </table>
-    </div>
+          <div align="middle">
+              <table style="width=100%">
+                  <tr>
+                      <td>
+                          <img src="writeup/q1_0.png" align="middle" width="400px" />
+                          <figcaption align="middle">Control points</figcaption>
+                      </td>
+                      <td>
+                          <img src="writeup/q1_1.png" align="middle" width="400px" />
+                          <figcaption align="middle">1st iteration</figcaption>
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>
+                          <img src="writeup/q1_2.png" align="middle" width="400px" />
+                          <figcaption align="middle">2nd iteration</figcaption>
+                      </td>
+                      <td>
+                          <img src="writeup/q1_3.png" align="middle" width="400px" />
+                          <figcaption align="middle">3rd iteration</figcaption>
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>
+                          <img src="writeup/q1_4.png" align="middle" width="400px" />
+                          <figcaption align="middle">4th iteration</figcaption>
+                      </td>
+                      <td>
+                          <img src="writeup/q1_5.png" align="middle" width="400px" />
+                          <figcaption align="middle">5th iteration</figcaption>
+                      </td>
+                  </tr>
+              </table>
+          </div>
+          <br />
+          <p>The final Bezier curve looks like this:</p>
+          <div align="middle">
+              <table style="width=100%">
+                  <tr>
+                      <td>
+                          <img src="writeup/q1_final.png" align="middle" width="400px" />
+                          <figcaption align="middle">Final curve</figcaption>
+                      </td>
+                  </tr>
+              </table>
+          </div>
+          <br />
+          <p>Here is an example of a different Bezier curve:</p>
+          <div align="middle">
+              <table style="width=100%">
+                  <tr>
+                      <td>
+                          <img src="writeup/q1_diff.png" align="middle" width="400px" />
+                          <figcaption align="middle">Different curve</figcaption>
+                      </td>
+                  </tr>
+              </table>
+          </div>
 
 
-    <h3 align="middle">Part 2: Bezier surfaces with separable 1D de Casteljau subdivision</h3>
+          <h3 align="middle">Part 2: Bezier surfaces with separable 1D de Casteljau subdivision</h3>
 
 
 
-    <h2 align="middle">Section II: Sampling</h2>
+          <h2 align="middle">Section II: Sampling</h2>
 
-    <h3 align="middle">Part 3: Average normals for half-edge meshes</h3>
-
-
-    <h3 align="middle">Part 4: Half-edge flip</h3>
+          <h3 align="middle">Part 3: Average normals for half-edge meshes</h3>
 
 
-    <h3 align="middle">Part 5: Half-edge split</h3>
+          <h3 align="middle">Part 4: Half-edge flip</h3>
 
 
-    <h3 align="middle">Part 6: Loop subdivision for mesh upsampling</h3>
+          <h3 align="middle">Part 5: Half-edge split</h3>
+
+
+          <h3 align="middle">Part 6: Loop subdivision for mesh upsampling</h3>
 
 
 
-    <h2 align="middle">Section III: Optional Extra Credit</h2>
-    <p>If you are not participating in the optional mesh competition, don't worry about this section!</p>
+          <h2 align="middle">Section III: Optional Extra Credit</h2>
+          <p>If you are not participating in the optional mesh competition, don't worry about this section!</p>
 
-    <h3 align="middle">Part 7: Design your own mesh!</h3>
+          <h3 align="middle">Part 7: Design your own mesh!</h3>
 
-</body>
+      </div></body>
 
 </html>

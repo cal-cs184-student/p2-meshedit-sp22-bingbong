@@ -186,6 +186,100 @@ namespace CGL
     // TODO Part 5.
     // This method should split the given edge and return an iterator to the newly inserted vertex.
     // The halfedge of this vertex should point along the edge that was split, rather than the new edges.
+          //save all the old stuff
+      if (e0->halfedge()->isBoundary() || e0->halfedge()->twin()->isBoundary()) {
+          return e0->halfedge()->vertex();
+      }
+      HalfedgeIter h = e0->halfedge();
+      //old halfedges
+      HalfedgeIter ha = h;
+      HalfedgeIter hta = h->twin();
+
+      HalfedgeIter hb = h->next();
+      HalfedgeIter hbt = h->next()->twin();
+
+      HalfedgeIter hc = h->next()->next();
+      HalfedgeIter hct = h->next()->next()->twin();
+
+      HalfedgeIter htb = hta->next();
+      HalfedgeIter htbt = hta->next()->twin();
+
+      HalfedgeIter htc = hta->next()->next();
+      HalfedgeIter htct = hta->next()->next()->twin();
+      //old edges
+      EdgeIter hea = e0;
+      EdgeIter heb = hb->edge();
+      EdgeIter hec = hc->edge();
+      EdgeIter hteb = htb->edge();
+      EdgeIter htec = htc->edge();
+      //old vertices
+      VertexIter a = h->next()->next()->vertex();
+      VertexIter b = h->vertex();
+      VertexIter c = h->next()->vertex();
+      VertexIter d = h->twin()->next()->next()->vertex();
+      //old faces
+      FaceIter fh = h->face();
+      FaceIter fht = h->twin()->face();
+
+      //make the new stuff
+      VertexIter nv = newVertex();
+      FaceIter nfa = newFace();
+      FaceIter nfb = newFace();
+      EdgeIter nea = newEdge();
+      EdgeIter neb = newEdge();
+      EdgeIter nec = newEdge();
+      HalfedgeIter nha = newHalfedge();
+      HalfedgeIter nhat = newHalfedge();
+      HalfedgeIter nhb = newHalfedge();
+      HalfedgeIter nhbt = newHalfedge();
+      HalfedgeIter nhc = newHalfedge();
+      HalfedgeIter nhct = newHalfedge();
+
+      //set new vertex
+      Vector3D newpos = Vector3D();
+      newpos.x = (c->position.x + b->position.x) / 2;
+      newpos.y = (c->position.y + b->position.y) / 2;
+      newpos.z = (c->position.z + b->position.z) / 2;
+      nv->position = newpos;
+      nv->halfedge() = ha;
+
+      //set everythinggg
+
+
+      //sN(next, twin, vertex, edge, face
+      (*ha).setNeighbors(hb, hta, nv, hea, fh);
+      (*hb).setNeighbors(nha, hbt, c, heb, fh);
+      (*nha).setNeighbors(ha, nhat, a, hea, fh);
+
+      (*nhat).setNeighbors(hc, nha, nv, hea, nfa);
+      (*hc).setNeighbors(nhb, hct, a, hec, nfa);
+      (*nhb).setNeighbors(nhat, nhbt, b, neb, nfa);
+
+      (*nhbt).setNeighbors(htb, nhb, nv, neb, nfb);
+      (*htb).setNeighbors(nhc, htbt, b, hteb, nfb);
+      (*nhc).setNeighbors(nhbt, nhct, d, nec, nfb);
+
+      (*nhct).setNeighbors(htc, nhc, nv, nec, fht);
+      (*htc).setNeighbors(hta, htct, d, htec, fht);
+      (*hta).setNeighbors(nhct, ha, c, hea, fht);
+
+      //faces
+      fh->halfedge() = ha;
+      fht->halfedge() = hta;
+      nfa->halfedge() = nhb;
+      nfb->halfedge() = nhbt;
+
+      // edges
+      hea->halfedge() = ha;
+      nea->halfedge() = nha;
+      neb->halfedge() = nhb;
+      nec->halfedge() = nhc;
+      // vertices
+      c->halfedge() = hb;
+      a->halfedge() = nha;
+      b->halfedge() = nhb;
+      d->halfedge() = nhc;
+
     return VertexIter();
   }
 

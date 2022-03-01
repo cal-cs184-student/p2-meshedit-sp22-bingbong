@@ -324,7 +324,7 @@ namespace CGL
               v = restore;
               float u;
               //int n = v->degree();
-              if (num_neighbors == 3) {
+              if (num_neighbors == 3.0) {
                   u = 3.0/16.0;
               } else {
                   u = 3.0/(8.0*num_neighbors);

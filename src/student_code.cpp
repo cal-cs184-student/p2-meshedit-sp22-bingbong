@@ -117,13 +117,67 @@ namespace CGL
     // TODO Part 4.
     // This method should flip the given edge and return an iterator to the flipped edge.
 
-      if (e0->getHalfedge()->isBoundary() || e0->getHalfedge()->twin()->isBoundary()) {
+      if (e0->halfedge()->isBoundary() || e0->halfedge()->twin()->isBoundary()) {
           return e0;
     }
     //save all the old stuff
+      HalfedgeIter h = e0->halfedge();
+      //old halfedges
+      HalfedgeIter ha = h;
+      HalfedgeIter hta = h->twin();
+
+      HalfedgeIter hb = h->next();
+      HalfedgeIter hbt = h->next()->twin();
+
+      HalfedgeIter hc = h->next()->next();
+      HalfedgeIter hct = h->next()->next()->twin();
+
+      HalfedgeIter htb = hta->next();
+      HalfedgeIter htbt = hta->next()->twin();
+
+      HalfedgeIter htc = hta->next()->next();
+      HalfedgeIter htct = hta->next()->next()->twin();
       //old edges
+      EdgeIter hea = e0;
+      EdgeIter heb = hb->edge();
+      EdgeIter hec = hc->edge();
+      EdgeIter hteb = htb->edge();
+      EdgeIter htec = htc->edge();
       //old vertices
-    //
+      VertexIter a = h->next()->next()->vertex();
+      VertexIter b = h->vertex();
+      VertexIter c = h->next()->vertex();
+      VertexIter d = h->twin()->next()->next()->vertex();
+      //old faces
+      FaceIter fh = h->face();
+      FaceIter fht = h->twin()->face();
+      
+    //DO THE NEW STUFF
+    //For each vertex, edge, and face, set its halfedge pointer.
+      //vertices
+      a->halfedge() = hc;
+      b->halfedge() = ha;
+      c->halfedge() = hb;
+      d->halfedge() = htc;
+      //halfedges
+      //sN(next, twin, vertex, edge, face)
+      (*ha).setNeighbors(htc, hta, a, hea, fh);
+      (*htc).setNeighbors(hb, htct, d, htec, fh);
+      (*hb).setNeighbors(ha, hbt, c, heb, fh);
+
+      (*hta).setNeighbors(hc, ha, d, hea, fht);
+      (*hc).setNeighbors(htb, hct, a, hec, fht);
+      (*htb).setNeighbors(hta, htbt, b, hteb, fht);
+      //edge
+      heb->halfedge() = hb;
+      hec->halfedge() = hc;
+      hea->halfedge() = ha;
+      htec->halfedge() = htb;
+      htec->halfedge() = htc;
+      //face
+      fh->halfedge() = ha;
+      fht->halfedge() = hta;
+      
     return EdgeIter();
   }
 

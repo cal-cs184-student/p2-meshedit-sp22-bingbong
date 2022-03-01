@@ -195,11 +195,11 @@ namespace CGL
       HalfedgeIter ha = h;
       HalfedgeIter hta = h->twin();
 
-      HalfedgeIter hb = h->next();
-      HalfedgeIter hbt = h->next()->twin();
+      HalfedgeIter hb = ha->next();
+      HalfedgeIter hbt = ha->next()->twin();
 
-      HalfedgeIter hc = h->next()->next();
-      HalfedgeIter hct = h->next()->next()->twin();
+      HalfedgeIter hc = ha->next()->next();
+      HalfedgeIter hct = ha->next()->next()->twin();
 
       HalfedgeIter htb = hta->next();
       HalfedgeIter htbt = hta->next()->twin();
@@ -258,9 +258,9 @@ namespace CGL
       //sN(next, twin, vertex, edge, face
       (*ha).setNeighbors(hb, hta, nv, hea, fh);
       (*hb).setNeighbors(nha, hbt, c, heb, fh);
-      (*nha).setNeighbors(ha, nhat, a, hea, fh);
+      (*nha).setNeighbors(ha, nhat, a, nea, fh);
 
-      (*nhat).setNeighbors(hc, nha, nv, hea, nfa);
+      (*nhat).setNeighbors(hc, nha, nv, nea, nfa);
       (*hc).setNeighbors(nhb, hct, a, hec, nfa);
       (*nhb).setNeighbors(nhat, nhbt, b, neb, nfa);
 

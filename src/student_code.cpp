@@ -246,9 +246,9 @@ namespace CGL
 
       //set new vertex
       Vector3D newpos = Vector3D();
-      newpos.x = (c->position.x + b->position.x) / 2;
-      newpos.y = (c->position.y + b->position.y) / 2;
-      newpos.z = (c->position.z + b->position.z) / 2;
+      newpos.x = (c->position.x + b->position.x) / 2.0;
+      newpos.y = (c->position.y + b->position.y) / 2.0;
+      newpos.z = (c->position.z + b->position.z) / 2.0;
       nv->position = newpos;
       nv->halfedge() = ha;
 
@@ -307,9 +307,10 @@ namespace CGL
       for( VertexIter v = mesh.verticesBegin(); v != mesh.verticesEnd(); v++ )
           {
               v->isNew = false;
-              Vector3D og_pos = v->position;
-              int num_neighbors = 0;
+              Vector3D og_pos = Vector3D(v->position);
+              float num_neighbors = 0;
               Vector3D neighbor_pos_sum = Vector3D();
+              VertexIter restore = v;
               HalfedgeIter h = v->halfedge();      // get the outgoing half-edge of the vertex
                   do {
                       HalfedgeIter h_twin = h->twin(); // get the opposite half-edge
@@ -320,15 +321,17 @@ namespace CGL
                       h = h_twin->next();               // move to the next outgoing half-edge of the vertex
                       num_neighbors ++;
                   } while(h != v->halfedge());
+              v = restore;
               float u;
+              //int n = v->degree();
               if (num_neighbors == 3) {
-                  u = 3/16;
+                  u = 3.0/16.0;
               } else {
-                  u = 3/(8*num_neighbors);
+                  u = 3.0/(8.0*num_neighbors);
               }
+              
               v->newPosition = (1-num_neighbors*u)*og_pos + u*neighbor_pos_sum;
-              v->isNew = false;
-              //(1 - n * u) * original_position + u * original_neighbor_position_sum
+              
           }
     
     // 2. Compute the updated vertex positions associated with edges, and store it in Edge::newPosition.
@@ -339,10 +342,11 @@ namespace CGL
               Vector3D p1 = e->halfedge()->twin()->vertex()->position;
               Vector3D p2 = e->halfedge()->next()->next()->vertex()->position;
               Vector3D p3 = e->halfedge()->twin()->next()->next()->vertex()->position;
-              Vector3D new_pos = (3/8) * (p0 + p1) + (1/8)*(p2 + p3);
+              Vector3D new_pos = (3.0/8) * (p0 + p1) + (1.0/8)*(p2 + p3);
               
               e->newPosition = new_pos;
               e->isNew = false;
+              e->isNew2 = false;
           }
       
     
@@ -363,19 +367,13 @@ namespace CGL
     // 4. Flip any new edge that connects an old and new vertex.
       for( EdgeIter e = mesh.edgesBegin(); e != mesh.edgesEnd(); e++ )
           {
-              
               if (e->isNew == true) {
-                  
-                  
                   if ((e->halfedge()->vertex()->isNew==true && e->halfedge()->twin()->vertex()->isNew == false) ||
                       (e->halfedge()->vertex()->isNew==false && e->halfedge()->twin()->vertex()->isNew == true)) {
                       //cout << "woobledee wobbledee";
                       mesh.flipEdge(e);
                   }
-                 
-                  
               }
-              
           }
 
     // 5. Copy the new vertex positions into final Vertex::position.
@@ -383,14 +381,16 @@ namespace CGL
       for( VertexIter v = mesh.verticesBegin(); v != mesh.verticesEnd(); v++ )
           {
               if (v->isNew != true) {
-                  //v->position = v->newPosition;
+                  v->position = v->newPosition;
+              } else {
+                  v->isNew = false;
               }
           }
       for( EdgeIter e = mesh.edgesBegin(); e != mesh.edgesEnd(); e++ )
           {
               if (e->isNew == false && e->isNew2==false) {
-                 // e->halfedge()->next()->vertex()->position = e->newPosition;
-                 //e->halfedge()->vertex()->position = e->newPosition;
+                 //e->halfedge()->next()->vertex()->position = e->newPosition;
+                 e->halfedge()->vertex()->position = e->newPosition;
               } else {
                   e->isNew = false;
                   e->isNew2 = false;

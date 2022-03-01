@@ -208,6 +208,8 @@ namespace CGL
       HalfedgeIter htct = hta->next()->next()->twin();
       //old edges
       EdgeIter hea = e0;
+      hea->isNew = false;
+      hea->isNew2 = false;
       EdgeIter heb = hb->edge();
       EdgeIter hec = hc->edge();
       EdgeIter hteb = htb->edge();
@@ -223,11 +225,18 @@ namespace CGL
 
       //make the new stuff
       VertexIter nv = newVertex();
+      nv->isNew = true;
       FaceIter nfa = newFace();
       FaceIter nfb = newFace();
       EdgeIter nea = newEdge();
+      nea->isNew = true;
+      nea->isNew2 = true;
       EdgeIter neb = newEdge();
+      neb->isNew = false; //note that this isnt actually a new edge (its half of the old edge), but we set it as new so we dont infinite loop in loop subdivison. can't trust the isNew param for edges.
+      neb->isNew2 = true;
       EdgeIter nec = newEdge();
+      nec->isNew = true;
+      nec->isNew2 = true;
       HalfedgeIter nha = newHalfedge();
       HalfedgeIter nhat = newHalfedge();
       HalfedgeIter nhb = newHalfedge();
@@ -294,17 +303,100 @@ namespace CGL
     // 1. Compute new positions for all the vertices in the input mesh, using the Loop subdivision rule,
     // and store them in Vertex::newPosition. At this point, we also want to mark each vertex as being
     // a vertex of the original mesh.
+      
+      for( VertexIter v = mesh.verticesBegin(); v != mesh.verticesEnd(); v++ )
+          {
+              v->isNew = false;
+              Vector3D og_pos = v->position;
+              int num_neighbors = 0;
+              Vector3D neighbor_pos_sum = Vector3D();
+              HalfedgeIter h = v->halfedge();      // get the outgoing half-edge of the vertex
+                  do {
+                      HalfedgeIter h_twin = h->twin(); // get the opposite half-edge
+                      VertexIter v = h_twin->vertex(); // vertex is the 'source' of the half-edge, so
+                                                        // h->vertex() is v, whereas h_twin->vertex()
+                                                        // is the neighboring vertex
+                      neighbor_pos_sum += v->position ;      // add the vertex pos to our sum of neighbor pos
+                      h = h_twin->next();               // move to the next outgoing half-edge of the vertex
+                      num_neighbors ++;
+                  } while(h != v->halfedge());
+              float u;
+              if (num_neighbors == 3) {
+                  u = 3/16;
+              } else {
+                  u = 3/(8*num_neighbors);
+              }
+              v->newPosition = (1-num_neighbors*u)*og_pos + u*neighbor_pos_sum;
+              v->isNew = false;
+              //(1 - n * u) * original_position + u * original_neighbor_position_sum
+          }
     
     // 2. Compute the updated vertex positions associated with edges, and store it in Edge::newPosition.
+      
+      for( EdgeIter e = mesh.edgesBegin(); e != mesh.edgesEnd(); e++ )
+          {
+              Vector3D p0 = e->halfedge()->vertex()->position;
+              Vector3D p1 = e->halfedge()->twin()->vertex()->position;
+              Vector3D p2 = e->halfedge()->next()->next()->vertex()->position;
+              Vector3D p3 = e->halfedge()->twin()->next()->next()->vertex()->position;
+              Vector3D new_pos = (3/8) * (p0 + p1) + (1/8)*(p2 + p3);
+              
+              e->newPosition = new_pos;
+              e->isNew = false;
+          }
+      
     
     // 3. Split every edge in the mesh, in any order. For future reference, we're also going to store some
     // information about which subdivide edges come from splitting an edge in the original mesh, and which edges
     // are new, by setting the flat Edge::isNew. Note that in this loop, we only want to iterate over edges of
     // the original mesh---otherwise, we'll end up splitting edges that we just split (and the loop will never end!)
-    
+      
+      
+      for( EdgeIter e = mesh.edgesBegin(); e != mesh.edgesEnd(); e++ )
+          {
+              if (e->isNew == false && e->isNew2 == false) {
+                  mesh.splitEdge(e);
+              }
+          }
+      
+      
     // 4. Flip any new edge that connects an old and new vertex.
+      for( EdgeIter e = mesh.edgesBegin(); e != mesh.edgesEnd(); e++ )
+          {
+              
+              if (e->isNew == true) {
+                  
+                  
+                  if ((e->halfedge()->vertex()->isNew==true && e->halfedge()->twin()->vertex()->isNew == false) ||
+                      (e->halfedge()->vertex()->isNew==false && e->halfedge()->twin()->vertex()->isNew == true)) {
+                      //cout << "woobledee wobbledee";
+                      mesh.flipEdge(e);
+                  }
+                 
+                  
+              }
+              
+          }
 
     // 5. Copy the new vertex positions into final Vertex::position.
-
+      
+      for( VertexIter v = mesh.verticesBegin(); v != mesh.verticesEnd(); v++ )
+          {
+              if (v->isNew != true) {
+                  //v->position = v->newPosition;
+              }
+          }
+      for( EdgeIter e = mesh.edgesBegin(); e != mesh.edgesEnd(); e++ )
+          {
+              if (e->isNew == false && e->isNew2==false) {
+                 // e->halfedge()->next()->vertex()->position = e->newPosition;
+                 //e->halfedge()->vertex()->position = e->newPosition;
+              } else {
+                  e->isNew = false;
+                  e->isNew2 = false;
+              }
+                  
+            
+          }
   }
 }

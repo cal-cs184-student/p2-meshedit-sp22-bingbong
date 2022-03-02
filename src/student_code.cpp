@@ -195,11 +195,11 @@ namespace CGL
       HalfedgeIter ha = h;
       HalfedgeIter hta = h->twin();
 
-      HalfedgeIter hb = h->next();
-      HalfedgeIter hbt = h->next()->twin();
+      HalfedgeIter hb = ha->next();
+      HalfedgeIter hbt = ha->next()->twin();
 
-      HalfedgeIter hc = h->next()->next();
-      HalfedgeIter hct = h->next()->next()->twin();
+      HalfedgeIter hc = ha->next()->next();
+      HalfedgeIter hct = ha->next()->next()->twin();
 
       HalfedgeIter htb = hta->next();
       HalfedgeIter htbt = hta->next()->twin();
@@ -331,6 +331,7 @@ void Vertex::computeCentroid() {
               Vector3D sum_neighbors = v->centroid;
               
               float u;
+
               
             if (num_neighbors == 3) {
                   u = 3.0/16.0;

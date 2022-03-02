@@ -156,7 +156,7 @@ namespace CGL
     //For each vertex, edge, and face, set its halfedge pointer.
       //vertices
       a->halfedge() = hc;
-      b->halfedge() = ha;
+      b->halfedge() = htb;
       c->halfedge() = hb;
       d->halfedge() = htc;
       //halfedges
@@ -172,7 +172,7 @@ namespace CGL
       heb->halfedge() = hb;
       hec->halfedge() = hc;
       hea->halfedge() = ha;
-      htec->halfedge() = htb;
+      hteb->halfedge() = htb;
       htec->halfedge() = htc;
       //face
       fh->halfedge() = ha;
@@ -232,8 +232,8 @@ namespace CGL
       nea->isNew = true;
       nea->isNew2 = true;
       EdgeIter neb = newEdge();
-      neb->isNew = false; //note that this isnt actually a new edge (its half of the old edge), but we set it as new so we dont infinite loop in loop subdivison. can't trust the isNew param for edges.
-      neb->isNew2 = true;
+      neb->isNew = false; //this is the bottom half of the old edge, so its not really a new edge (its black not blue in loop subdivisoin)
+      neb->isNew2 = true; //note that this isnt actually a new edge (its half of the old edge), but we set it as new so we dont infinite loop in loop subdivison. can't trust the isNew param for edges.
       EdgeIter nec = newEdge();
       nec->isNew = true;
       nec->isNew2 = true;
@@ -289,8 +289,22 @@ namespace CGL
       b->halfedge() = nhb;
       d->halfedge() = nhc;
 
-    return VertexIter();
+    return nv;
   }
+
+void Vertex::computeCentroid() {
+    Vector3D avg = Vector3D(); // avg is actually a sum, not avg
+    HalfedgeIter h = halfedge();      // get the outgoing half-edge of the vertex
+        do {
+            HalfedgeIter h_twin = h->twin(); // get the opposite half-edge
+            VertexIter v2 = h_twin->vertex(); // vertex is the 'source' of the half-edge, so
+            avg += v2->position;
+            // h->vertex() is v, whereas h_twin->vertex()
+                                              // is the neighboring vertex
+            h = h_twin->next();               // move to the next outgoing half-edge of the vertex
+        } while(h != halfedge());
+    centroid = avg;
+}
 
 
 
@@ -306,32 +320,25 @@ namespace CGL
       
       for( VertexIter v = mesh.verticesBegin(); v != mesh.verticesEnd(); v++ )
           {
+              if (v->isNew) {
+                  cout << "Bad";
+              }
               v->isNew = false;
               Vector3D og_pos = Vector3D(v->position);
-              float num_neighbors = 0;
-              Vector3D neighbor_pos_sum = Vector3D();
-              VertexIter restore = v;
-              HalfedgeIter h = v->halfedge();      // get the outgoing half-edge of the vertex
-                  do {
-                      HalfedgeIter h_twin = h->twin(); // get the opposite half-edge
-                      VertexIter v = h_twin->vertex(); // vertex is the 'source' of the half-edge, so
-                                                        // h->vertex() is v, whereas h_twin->vertex()
-                                                        // is the neighboring vertex
-                      neighbor_pos_sum += v->position ;      // add the vertex pos to our sum of neighbor pos
-                      h = h_twin->next();               // move to the next outgoing half-edge of the vertex
-                      num_neighbors ++;
-                  } while(h != v->halfedge());
-              v = restore;
+              int num_neighbors = v->degree();
+              
+              v->computeCentroid();
+              Vector3D sum_neighbors = v->centroid;
+              
               float u;
-              //int n = v->degree();
-              if (num_neighbors == 3) {
+              
+            if (num_neighbors == 3) {
                   u = 3.0/16.0;
               } else {
                   u = 3.0/(8.0*num_neighbors);
               }
               
-              v->newPosition = (1-num_neighbors*u)*og_pos + u*neighbor_pos_sum;
-              
+              v->newPosition = (1.0-num_neighbors*u)*og_pos + u*sum_neighbors;
           }
     
     // 2. Compute the updated vertex positions associated with edges, and store it in Edge::newPosition.
@@ -355,11 +362,11 @@ namespace CGL
     // are new, by setting the flat Edge::isNew. Note that in this loop, we only want to iterate over edges of
     // the original mesh---otherwise, we'll end up splitting edges that we just split (and the loop will never end!)
       
-      
       for( EdgeIter e = mesh.edgesBegin(); e != mesh.edgesEnd(); e++ )
           {
               if (e->isNew == false && e->isNew2 == false) {
-                  mesh.splitEdge(e);
+                  VertexIter new_v = mesh.splitEdge(e);
+                  new_v->newPosition = e->newPosition;
               }
           }
       
@@ -370,32 +377,31 @@ namespace CGL
               if (e->isNew == true) {
                   if ((e->halfedge()->vertex()->isNew==true && e->halfedge()->twin()->vertex()->isNew == false) ||
                       (e->halfedge()->vertex()->isNew==false && e->halfedge()->twin()->vertex()->isNew == true)) {
-                      //cout << "woobledee wobbledee";
                       mesh.flipEdge(e);
                   }
               }
           }
 
     // 5. Copy the new vertex positions into final Vertex::position.
-      
       for( VertexIter v = mesh.verticesBegin(); v != mesh.verticesEnd(); v++ )
           {
               if (v->isNew != true) {
                   v->position = v->newPosition;
               } else {
                   v->isNew = false;
+                  v->position = v->newPosition;
               }
           }
       for( EdgeIter e = mesh.edgesBegin(); e != mesh.edgesEnd(); e++ )
           {
               if (e->isNew == false && e->isNew2==false) {
+                  int abc = 0;
                  //e->halfedge()->next()->vertex()->position = e->newPosition;
-                 e->halfedge()->vertex()->position = e->newPosition;
+                 //e->halfedge()->vertex()->position = e->newPosition;
               } else {
                   e->isNew = false;
                   e->isNew2 = false;
-              }
-                  
+              } 
             
           }
   }

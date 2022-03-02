@@ -435,7 +435,7 @@ namespace CGL
           * computes the average of the neighboring vertex positions and stores it in Vertex::centroid
           */
          void computeCentroid( void );
-
+        
          Vector3D centroid; ///< average of neighbor positions, storing the value computed by Vertex::computeCentroid()
 
          Vector3D normal( void ) const;
@@ -522,7 +522,7 @@ namespace CGL
 
          Vector3D newPosition; ///< For Loop subdivision, this will be the position for the edge midpoint
          bool isNew; ///< For Loop subdivision, this flag should be true if and only if this edge is a new edge created by subdivision (i.e., if it cuts across a triangle in the original mesh)
-       bool isNew2;
+         bool isNew2;
        
          EdgeRecord record;
 

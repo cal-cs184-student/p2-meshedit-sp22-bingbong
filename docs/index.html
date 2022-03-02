@@ -159,6 +159,9 @@
 
 
           <h3 align="middle">Part 4: Half-edge flip</h3>
+          <p>
+              The first step in implementing our edge flip operation was saving all of the old edges, vertices, halfedges, and faces. After that, we drew out a detailed diagram of every single variable for the edge pre-flip and post-flip. We then went through and changed the pointers for each edge, face, vertex, and halfedge. For halfedges, we used the setNeighbors function.
+          </p>
           <p>Here are the diagrams we used to code out this function:</p>
           <div align="middle">
               <table style="width=100%">
@@ -174,7 +177,7 @@
                   </tr>
               </table>
           </div>
-
+          <p>Here is a mesh before and after some flips:</p>
           <div align="middle">
               <table style="width=100%">
                   <tr>
@@ -189,9 +192,13 @@
                   </tr>
               </table>
           </div>
+          <p>Debugging:</p>
+          <p>
+              We thought our implementation worked, but found out later that we messed up a single pointer when our 6 didn’t work :(. We went through it several times and didn’t find the issue. At this point, we added every single element in the mesh to our code. We tried to run the code several times, and observed different vertices and their attributes. We found that some vertices were saying that they had more neighbors than they actually had. Finally, we got it by saying each individual variable out loud and following the diagram. Turns out that we had misassigned the halfedge of a vertex, which lines up with the observations we made about the number of neighbors of a vertex.
+          </p>
 
           <h3 align="middle">Part 5: Half-edge split</h3>
-
+          <p>We followed the same steps as Part 4 – we drew a diagram, and used the same original variables that we used in Part 5. This helped us a lot, since we did not need to go back and re-save all of the variables in the mesh. After this, we had to make new elements in the mesh, which we did not have to do in Part 4.  Again, we changed the pointers for every edge, face, vertex, and halfedge. </p>
           <p>Here are the diagrams we used to code out this function:</p>
           <div align="middle">
               <table style="width=100%">
@@ -207,7 +214,8 @@
                   </tr>
               </table>
           </div>
-
+          <p>Later, when we did Part 6, we realized that we needed to differentiate between old and new edges, as well as old and new vertices. In order to account for this, we created attributes isNew and isNew2 for edges, and isNew for vertices. isNew represents whether or not that edge is new and NOT split from the original edge. In other words, only nea and nec should be labeled isNew in our diagram. isNew2 represents which edges are new in general. So, in our diagram, nea, neb, and nec are labeled isNew2. We also labeled our new vertex, nv, as new. We set these attributes in this part so that they are set when we create new edges and vertices from a split. </p>
+          <p>Here is a mesh before and after some flips and splits:</p>
           <div align="middle">
               <table style="width=100%">
                   <tr>
@@ -222,7 +230,8 @@
                   </tr>
               </table>
           </div>
-
+          <p>Debugging:</p>
+          <p>Again, we did not realize there was a bug in this part until Part 6. One silly thing is that we named one of the old edges <i>hea</i>, and one of the new edges <i>nea</i>. It’s very hard to differentiate between <i>hea</i> and <i>nea</i> with our handwriting, so we mixed those up when we were actually coding it. </p>
           <h3 align="middle">Part 6: Loop subdivision for mesh upsampling</h3>
           <p>Here is a cube with loop subdivision:</p>
           <div align="center">
